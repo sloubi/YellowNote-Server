@@ -187,13 +187,17 @@ class Db extends OAuth2\Storage\Pdo
             return false;
 
         $stmt = $this->db->prepare("INSERT INTO {$this->config['note_table']}
-                                    SET title = :title, content = :content, shared_key = :key
-                                    ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content)");
+                                    SET title = :title, content = :content, shared_key = :key,
+                                        created_at = :created_at, updated_at = :updated_at
+                                    ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content),
+                                        updated_at = VALUES(updated_at)");
         foreach ($notes as $note)
         {
             $stmt->bindValue(':title', $note['title'], PDO::PARAM_STR);
             $stmt->bindValue(':content', $note['content'], PDO::PARAM_STR);
             $stmt->bindValue(':key', $note['shared_key'], PDO::PARAM_STR);
+            $stmt->bindValue(':created_at', $note['created_at'], PDO::PARAM_STR);
+            $stmt->bindValue(':updated_at', $note['updated_at'], PDO::PARAM_STR);
             $stmt->execute();
         }
     }
